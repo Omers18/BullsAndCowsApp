@@ -133,7 +133,7 @@ namespace BullsAndCowsApp
                 return 6;
             }
 
-            errorMessage = "Invalid difficulty. Please choose a difficulty from 1-3.";
+            errorMessage = "Error: Invalid difficulty. Please choose a difficulty from 1-3.";
             return -1;
         }
 
@@ -150,7 +150,8 @@ namespace BullsAndCowsApp
                 
                 if (string.IsNullOrWhiteSpace(input))
                 {
-                    Console.WriteLine("Difficulty cannot be empty");
+                    Console.WriteLine("Error: Difficulty cannot be empty");
+                    Console.WriteLine();
                     continue;
                 }
 
@@ -169,7 +170,7 @@ namespace BullsAndCowsApp
         static void PrintWelcome()
         {
             Console.WriteLine(new string('=', 40));
-            Console.WriteLine("        BULLS AND COWS (CLI)");
+            Console.WriteLine("           BULLS AND COWS");
             Console.WriteLine(new string('=', 40));
 
             Console.WriteLine();
