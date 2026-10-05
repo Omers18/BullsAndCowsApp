@@ -6,25 +6,23 @@ namespace BullsAndCowsApp
     {
         static void Main(string[] args)
         {
-
             PrintWelcome();
             Console.WriteLine();
 
             int codeLength = ChooseDifficulty();
 
             BullsAndCowsGame game = new BullsAndCowsGame(codeLength);
-            List<GuessRecord> history = new List<GuessRecord>();
             int bestScore = 0;
 
-
+            Console.WriteLine();
             Console.WriteLine("Enter your name");
             string playerName = Console.ReadLine();
             Console.WriteLine();
 
-
-            while (true) 
+            while (true)
             {
-                Console.WriteLine($"Please enter a {game.CodeLength} digit number. 'n'=new game, 'h' = history, 'q'=quit");
+                Console.WriteLine($"Please enter a {game.CodeLength} digit number. 'n'=new game, 'q'=quit");
+
                 string input = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(input))
@@ -41,23 +39,18 @@ namespace BullsAndCowsApp
 
                 else if (IsNewGame(input))
                 {
-                    codeLength = ChooseDifficulty();
+                    Console.WriteLine();
 
+                    codeLength = ChooseDifficulty();
                     game.StartNewGame(codeLength);
-                    history.Clear();
+
                     Console.WriteLine();
                     Console.WriteLine("New game started.");
+
                     continue;
                 }
 
-                else if (IsHistory(input)) 
-                {
-                    Console.WriteLine();
-                    PrintHistory(history);
-                    continue;
-                }
-
-                else if (game.IsGameOver) 
+                else if (game.IsGameOver)
                 {
                     Console.WriteLine("The game is already over. Start a new game.");
                     continue;
@@ -65,7 +58,8 @@ namespace BullsAndCowsApp
 
                 else
                 {
-                    if (!BullsAndCowsGame.IsValidGuess(input, game.CodeLength, out string errorMessage))
+                    if (!BullsAndCowsGame.IsValidGuess(input, game.CodeLength,
+                        out string errorMessage))
                     {
                         Console.WriteLine();
                         Console.WriteLine(errorMessage);
@@ -76,20 +70,18 @@ namespace BullsAndCowsApp
                     else
                     {
                         GuessResult result = game.SubmitGuess(input);
-                        GuessRecord record = new GuessRecord();
-                        record.AttemptNumber = game.AttemptCount;
-                        record.Guess = input;
-                        record.Bulls = result.Bulls;
-                        record.Cows = result.Cows;
-                        history.Add(record);
 
-                        Console.WriteLine(record.Feedback);
+                        Console.WriteLine(
+                            $"Your guess: {input}. Bulls: {result.Bulls}. Cows: {result.Cows}");
+
+                        Console.WriteLine();
 
                         if (result.IsWinningGuess)
                         {
-                            int attempts = record.AttemptNumber;
+                            int attempts = game.AttemptCount;
 
-                            Console.WriteLine($"Correct, {playerName}! You guessed the secret number in {attempts} attempts.");
+                            Console.WriteLine(
+                                $"Correct, {playerName}! You guessed the secret number in {attempts} attempts.");
 
                             if (bestScore == 0 || attempts < bestScore)
                             {
@@ -101,12 +93,14 @@ namespace BullsAndCowsApp
                                 bestScore = attempts;
                             }
 
-                            Console.WriteLine($"Your current best score is {bestScore} attempts.");
-                            Console.WriteLine("Type 'n' for a new game or 'q' to quit.");
+                            Console.WriteLine(
+                                $"Your current best score is {bestScore} attempts.");
+
+                            Console.WriteLine(
+                                "Type 'n' for a new game or 'q' to quit.");
                         }
                     }
                 }
-
             }
         }
 
@@ -147,7 +141,7 @@ namespace BullsAndCowsApp
                 Console.WriteLine("3 - Hard (6 digits)");
 
                 string input = Console.ReadLine();
-                
+
                 if (string.IsNullOrWhiteSpace(input))
                 {
                     Console.WriteLine("Error: Difficulty cannot be empty");
@@ -189,32 +183,11 @@ namespace BullsAndCowsApp
 
         }
 
-        static bool IsNewGame(string input) 
+        static bool IsNewGame(string input)
         {
             return input.Equals("n", StringComparison.OrdinalIgnoreCase)
                 || input.Equals("new", StringComparison.OrdinalIgnoreCase);
         }
-
-        static bool IsHistory(string input)
-        {
-            return input.Equals("h", StringComparison.OrdinalIgnoreCase)
-                || input.Equals("history", StringComparison.OrdinalIgnoreCase);
-        }
-
-        static void PrintHistory(List<GuessRecord> history)
-        {
-            if (history.Count == 0) { Console.WriteLine("No guesses yet."); }
-
-            else
-            {
-                for (int i = 0; i < history.Count; i++)
-                {
-                    GuessRecord currentGuess = history[i];
-                    Console.WriteLine($"Attempt Number {currentGuess.AttemptNumber} -" +
-                        $" Your Guess:{currentGuess.Guess}. {currentGuess.Feedback}. ");
-                }
-            }
-        }
-
+    
     }
 }
