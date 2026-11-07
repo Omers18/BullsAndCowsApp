@@ -12,6 +12,14 @@ namespace BullsAndCowsApp.Models
         public int AttemptCount { get; private set; }
         public bool IsGameOver { get; private set; }
 
+
+        public int GeneratedNumber { get; private set; }
+
+        public void GenerateNumber() 
+        {
+            GeneratedNumber = _random.Next(1000, 10000);
+        }
+
         public BullsAndCowsGame(int codeLength)
         {
             _random = new Random();
@@ -72,7 +80,7 @@ namespace BullsAndCowsApp.Models
                 return false;
             }
 
-            for (int i = 0; i < guess.Length; i++) 
+            for (int i = 0; i < guess.Length; i++)
             {
                 if (guess[i] < '0' || guess[i] > '9')
                 {
@@ -103,7 +111,7 @@ namespace BullsAndCowsApp.Models
             return true;
         }
 
-        public GuessResult SubmitGuess(string guess) 
+        public GuessResult SubmitGuess(string guess)
         {
             if (IsGameOver)
             {

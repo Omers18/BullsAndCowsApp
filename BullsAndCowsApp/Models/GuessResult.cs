@@ -15,10 +15,10 @@ namespace BullsAndCowsApp.Models
 
         public int Bulls { get; set; }
         public int Cows { get; set; }
-        public bool IsWinningGuess 
+        public bool IsWinningGuess
         {
             get { return Bulls == _codeLength; }
-             
+
         }
     }
 }

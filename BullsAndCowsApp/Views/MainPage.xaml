@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- MainPage: the only page of the app (the View in MVVM).
+     It only shows data and sends button clicks to the ViewModel.
+     All game logic lives in GameViewModel and the Models. -->
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:BullsAndCowsApp.ViewModels"
+             x:Class="BullsAndCowsApp.Views.MainPage"
+             x:DataType="vm:GameViewModel"
+             Title="Bulls &amp; Cows"
+             BackgroundColor="White">
+
+    <!-- ScrollView so the page still works on small screens -->
+    <ScrollView>
+
+        <!-- The light-yellow rounded card from the design -->
+        <Border BackgroundColor="#FFF2CC"
+                Stroke="#FFF2CC"
+                StrokeShape="RoundRectangle 40"
+                Padding="24,24,24,40"
+                Margin="16"
+                MaximumWidthRequest="380"
+                HorizontalOptions="Center">
+
+            <VerticalStackLayout Spacing="16">
+
+                <!-- ===== Title ===== -->
+                <Label Text="BULLS &amp; COWS"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="#1F2D4D"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- Welcome text, e.g. "Welcome! Guess the 4 digit number" (changes with difficulty) -->
+                <Label Text="{Binding WelcomeMessage}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#1F2D4D"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- ===== Difficulty ===== -->
+                <VerticalStackLayout Spacing="4" WidthRequest="220">
+                    <Label Text="Difficulty"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="#1F2D4D" />
+
+                    <!-- White rounded box around the Picker -->
+                    <Border BackgroundColor="White"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,0">
+                        <!-- The list of levels and the chosen level both come from the ViewModel -->
+                        <Picker ItemsSource="{Binding Difficulties}"
+                                SelectedItem="{Binding SelectedDifficulty}"
+                                FontSize="15"
+                                FontAttributes="Bold"
+                                TextColor="#1F2D4D"
+                                HorizontalTextAlignment="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- ===== Attempts and Best Score (two green boxes side by side) ===== -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
+
+                    <!-- Attempts box -->
+                    <Border Grid.Column="0"
+                            BackgroundColor="#C5E0B4"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 16"
+                            HeightRequest="100">
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label Text="Attempts"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding Attempts}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Best Score box ("-" until the first win) -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#C5E0B4"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 16"
+                            HeightRequest="100">
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label Text="Best Score"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding BestScoreText}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ===== Guess input ===== -->
+                <VerticalStackLayout Spacing="4" WidthRequest="220">
+                    <Label Text="Your Guess:"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="#1F2D4D" />
+
+                    <!-- White rounded box around the Entry -->
+                    <Border BackgroundColor="White"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 10"
+                            Padding="8,0">
+                        <!-- Two-way binding: what the player types goes into GuessText.
+                             MaxLength follows the difficulty (4, 5 or 6).
+                             Pressing Enter also submits the guess. -->
+                        <Entry Text="{Binding GuessText}"
+                               Placeholder="Enter your guess"
+                               MaxLength="{Binding CodeLength}"
+                               Keyboard="Numeric"
+                               IsEnabled="{Binding CanGuess}"
+                               ReturnCommand="{Binding SubmitGuessCommand}"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#1F2D4D"
+                               HorizontalTextAlignment="Center" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <!-- ===== Submit button (orange) - disabled after a win ===== -->
+                <Button Text="Submit"
+                        Command="{Binding SubmitGuessCommand}"
+                        IsEnabled="{Binding CanGuess}"
+                        WidthRequest="220"
+                        BackgroundColor="#C55A11"
+                        TextColor="#1F2D4D"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        BorderColor="#2F528F"
+                        BorderWidth="1.5"
+                        CornerRadius="10" />
+
+                <!-- ===== Bulls and Cows of the last guess ===== -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="40" Padding="20,0">
+
+                    <!-- Bulls box -->
+                    <Border Grid.Column="0"
+                            BackgroundColor="#C5E0B4"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 14"
+                            HeightRequest="75"
+                            Padding="10,0">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <Label Text="Bulls:"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D" />
+                            <Label Text="{Binding Bulls}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Cows box -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#C5E0B4"
+                            Stroke="#2F528F"
+                            StrokeThickness="1.5"
+                            StrokeShape="RoundRectangle 14"
+                            HeightRequest="75"
+                            Padding="10,0">
+                        <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                            <Label Text="Cows:"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D" />
+                            <Label Text="{Binding Cows}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="#1F2D4D" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ===== Messages ===== -->
+                <!-- Error message in red (the "Errors" box in the design). Shown only when there is an error. -->
+                <Label Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding HasError}"
+                       FontSize="17"
+                       FontAttributes="Bold"
+                       TextColor="#FF0000"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- Win message, e.g. "Correct! You guessed it in 7 attempts. New record achieved!"
+                     Shown only after the player wins. -->
+                <Label Text="{Binding WinMessage}"
+                       IsVisible="{Binding IsGameOver}"
+                       FontSize="17"
+                       FontAttributes="Bold"
+                       TextColor="#1F2D4D"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- ===== New Game button (green) ===== -->
+                <Button Text="New Game"
+                        Command="{Binding NewGameCommand}"
+                        WidthRequest="220"
+                        BackgroundColor="#92D050"
+                        TextColor="#1F2D4D"
+                        FontSize="15"
+                        FontAttributes="Bold"
+                        BorderColor="#2F528F"
+                        BorderWidth="1.5"
+                        CornerRadius="10" />
+
+                <Button Text="Click to generate a new number"
+         Command="{Binding NewNumberCommand}"
+         WidthRequest="220"
+         BackgroundColor="#92D050"
+         TextColor="#1F2D4D"
+         FontSize="15"
+         FontAttributes="Bold"
+         BorderColor="#2F528F"
+         BorderWidth="1.5"
+         CornerRadius="10" />
+
+                <Label Text="{Binding GeneratedNumber}"
+       FontSize="18"
+       FontAttributes="Bold"
+       TextColor="#1F2D4D" />
+
+
+            </VerticalStackLayout>
+        </Border>
+    </ScrollView>
+</ContentPage>
